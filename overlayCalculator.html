@@ -33,6 +33,9 @@
     <label for="image">Image:</label>
     <input type="file" id="image" name="image" accept="image/*">
     <br>
+    <label for="foreground">Foreground color:</label>
+    <input type="color" id="foreground" name="foreground">
+    <br>
     <label for="background">Background color:</label>
     <input type="color" id="background" name="background">
     <br>
@@ -40,8 +43,19 @@
     <br>
     <canvas id="result"></canvas>
 
-    <script>const image = document.getElementById("image");
+    <script>function hexToRgb(hex) {
+            var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            } : null;
+        }
+
+        const image = document.getElementById("image");
+        const foreground = document.getElementById("foreground");
         const background = document.getElementById("background");
+        background.value = '#00FF00';
         const overlayBtn = document.getElementById("overlay");
         const resultCanvas = document.getElementById("result");
         const ctx = resultCanvas.getContext("2d");
@@ -50,15 +64,31 @@
             const img = new Image();
             img.src = URL.createObjectURL(image.files[0]);
             img.onload = () => {
+                var imageCanvas = document.createElement('canvas');
+                var imageContext = imageCanvas.getContext('2d');
+                imageCanvas.width = img.width;
+                imageCanvas.height = img.height;
+                imageContext.drawImage(img, 0, 0);
+                var imageData = imageContext.getImageData(0, 0, img.width, img.height);
+                var data = imageData.data;
+                const f = hexToRgb(foreground.value);
+                const b = hexToRgb(background.value);
+                for (var i = 0; i < data.length; i += 4) {
+                    var a = 255 * (data[i + 1] - b.g) / (f.g - b.g);
+                    data[i + 0] = f.r;
+                    data[i + 1] = f.g;
+                    data[i + 2] = f.b;
+                    data[i + 3] = a;
+                }
+                let overlayImage = new Image();
+                overlayImage.src = imageCanvas.toDataURL();
+
                 const width = img.width;
                 const height = img.height;
                 resultCanvas.width = width;
                 resultCanvas.height = height;
                 ctx.clearRect(0, 0, width, height);
-                ctx.fillStyle = background.value;
-                ctx.fillRect(0, 0, width, height);
-                ctx.globalCompositeOperation = "destination-in";
-                ctx.drawImage(img, 0, 0, width, height);
+                ctx.putImageData(imageData, 0, 0);
             };
         });</script>
 </body>
