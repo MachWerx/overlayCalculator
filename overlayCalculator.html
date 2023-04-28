@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Image Overlay</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        #image {
+            margin-bottom: 20px;
+            max-width: 200px;
+            max-height: 200px;
+        }
+
+        #color {
+            margin-bottom: 20px;
+        }
+
+        #result {
+            width: 200px;
+            height: 200px;
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <label for="image">Image:</label>
+    <input type="file" id="image" name="image" accept="image/*">
+    <br>
+    <label for="color">Color:</label>
+    <input type="color" id="color" name="color">
+    <br>
+    <button id="overlay">Overlay Image</button>
+    <br>
+    <canvas id="result"></canvas>
+
+    <script>const image = document.getElementById("image");
+        const color = document.getElementById("color");
+        const overlayBtn = document.getElementById("overlay");
+        const resultCanvas = document.getElementById("result");
+        const ctx = resultCanvas.getContext("2d");
+
+        overlayBtn.addEventListener("click", () => {
+            const img = new Image();
+            img.src = URL.createObjectURL(image.files[0]);
+            img.onload = () => {
+                const width = img.width;
+                const height = img.height;
+                resultCanvas.width = width;
+                resultCanvas.height = height;
+                ctx.clearRect(0, 0, width, height);
+                ctx.fillStyle = color.value;
+                ctx.fillRect(0, 0, width, height);
+                ctx.globalCompositeOperation = "destination-in";
+                ctx.drawImage(img, 0, 0, width, height);
+            };
+        });</script>
+</body>
+</html>
