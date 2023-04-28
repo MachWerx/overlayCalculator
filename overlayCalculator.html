@@ -33,15 +33,15 @@
     <label for="image">Image:</label>
     <input type="file" id="image" name="image" accept="image/*">
     <br>
-    <label for="color">Color:</label>
-    <input type="color" id="color" name="color">
+    <label for="background">Background color:</label>
+    <input type="color" id="background" name="background">
     <br>
-    <button id="overlay">Overlay Image</button>
+    <button id="overlay">Calculate overlay</button>
     <br>
     <canvas id="result"></canvas>
 
     <script>const image = document.getElementById("image");
-        const color = document.getElementById("color");
+        const background = document.getElementById("background");
         const overlayBtn = document.getElementById("overlay");
         const resultCanvas = document.getElementById("result");
         const ctx = resultCanvas.getContext("2d");
@@ -55,7 +55,7 @@
                 resultCanvas.width = width;
                 resultCanvas.height = height;
                 ctx.clearRect(0, 0, width, height);
-                ctx.fillStyle = color.value;
+                ctx.fillStyle = background.value;
                 ctx.fillRect(0, 0, width, height);
                 ctx.globalCompositeOperation = "destination-in";
                 ctx.drawImage(img, 0, 0, width, height);
